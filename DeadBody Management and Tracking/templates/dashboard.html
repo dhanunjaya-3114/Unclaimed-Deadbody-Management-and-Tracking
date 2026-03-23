@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8f2ea;
+            color: #2e1f13;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 0 16px 30px 16px;
+        }
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn {
+            text-decoration: none;
+            background: #2e1f13;
+            color: #fff;
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 13px;
+            cursor: pointer;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            margin-top: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        th, td {
+            border: 1px solid #ece3d8;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 14px;
+        }
+        th {
+            background: #f1e4d4;
+        }
+        form.inline {
+            display: inline;
+        }
+        .row-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        input[type="text"] {
+            padding: 7px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            width: 140px;
+        }
+        input[type="email"], input[type="password"], select {
+            padding: 7px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            width: 180px;
+        }
+        .section-title {
+            margin-top: 26px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top">
+            <div>
+                <h2>Dashboard</h2>
+                <div>Logged in as: <strong>{{ mail }}</strong></div>
+            </div>
+            <div class="row-actions">
+                <a class="btn" href="/search_body">Search Bodies</a>
+                {% if role in ["Admin", "Nurse", "Police"] %}
+                <a class="btn" href="/add_body">Register Body</a>
+                {% endif %}
+                <a class="btn" href="/logout">Logout</a>
+            </div>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p style="color: {% if category == 'error' %}#b00020{% else %}#0f7a32{% endif %};">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="cards">
+            <div class="card"><strong>Total</strong><br>{{ total_bodies }}</div>
+            <div class="card"><strong>Unclaimed</strong><br>{{ unclaimed }}</div>
+            <div class="card"><strong>Claimed</strong><br>{{ claimed }}</div>
+            <div class="card"><strong>Cremated</strong><br>{{ cremated }}</div>
+        </div>
+
+        {% if role == "Admin" %}
+        <h3 class="section-title">Create Staff User</h3>
+        <form method="post" action="/create_user" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="email" name="u_email" placeholder="staff email" required>
+            <input type="password" name="u_password" placeholder="temporary password" required>
+            <select name="role_name" required>
+                <option value="">Select role</option>
+                <option value="Admin">Admin</option>
+                <option value="Nurse">Nurse</option>
+                <option value="Police">Police</option>
+            </select>
+            <button class="btn" type="submit">Create User</button>
+        </form>
+
+        {% if users %}
+        <table>
+            <tr>
+                <th>User ID</th>
+                <th>Email</th>
+                <th>Role</th>
+            </tr>
+            {% for user, role_name in users %}
+            <tr>
+                <td>{{ user.u_id }}</td>
+                <td>{{ user.u_email }}</td>
+                <td>{{ role_name }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        {% endif %}
+
+        {% if role in ["Admin", "Police"] and pending_claims %}
+        <h3 class="section-title">Pending Claims</h3>
+        <table>
+            <tr>
+                <th>Claim ID</th>
+                <th>Tag</th>
+                <th>Claimant</th>
+                <th>Phone</th>
+                <th>Relation</th>
+                <th>Action</th>
+            </tr>
+            {% for claim in pending_claims %}
+            <tr>
+                <td>{{ claim.claim_id }}</td>
+                <td>{{ claim.body.tag_number }}</td>
+                <td>{{ claim.claimant_name }}</td>
+                <td>{{ claim.claimant_phone }}</td>
+                <td>{{ claim.claimant_relation }}</td>
+                <td>
+                    <form class="inline" method="post" action="/review_claim/{{ claim.claim_id }}/approve">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="text" name="review_note" placeholder="optional note">
+                        <button class="btn" type="submit">Approve</button>
+                    </form>
+                    <form class="inline" method="post" action="/review_claim/{{ claim.claim_id }}/reject">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="btn" type="submit">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        <h3 class="section-title">Recent Bodies</h3>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Tag</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Location</th>
+                <th>Date Found</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for body in latest_bodies %}
+            <tr>
+                <td>{{ body.body_id }}</td>
+                <td>{{ body.tag_number }}</td>
+                <td>{{ body.approx_age or "-" }}</td>
+                <td>{{ body.gender }}</td>
+                <td>{{ body.found_location }}</td>
+                <td>{{ body.date_found }}</td>
+                <td>{{ body.status }}</td>
+                <td>
+                    <a class="btn" href="/body/{{ body.body_id }}">View</a>
+                    {% if role == "Admin" %}
+                    <a class="btn" href="/edit_body/{{ body.body_id }}">Edit</a>
+                    {% endif %}
+                    {% if role in ["Admin", "Nurse", "Police"] and body.status != "Cremated" %}
+                    <form method="post" action="/mark_cremated/{{ body.body_id }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="text" name="death_certificate" placeholder="certificate no">
+                        <button class="btn" type="submit">Mark Cremated</button>
+                    </form>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

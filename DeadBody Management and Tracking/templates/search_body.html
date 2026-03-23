@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Bodies</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f2ea; margin: 0; }
+        .wrap { max-width: 1050px; margin: 20px auto; padding: 0 16px; }
+        .panel { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        input, select {
+            width: 100%;
+            border: 1px solid #bdbdbd;
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { border: 1px solid #ece3d8; padding: 9px; text-align: left; vertical-align: top; font-size: 14px; }
+        th { background: #f1e4d4; }
+        .btn {
+            background: #2e1f13;
+            color: #fff;
+            border: 0;
+            border-radius: 7px;
+            padding: 8px 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        form.inline { display: inline; }
+        .claim-form input { margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="panel">
+            <h2>Search Dead Body Records</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <p style="color: {% if category == 'error' %}#b00020{% else %}#0f7a32{% endif %};">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <form method="get" action="/search_body">
+                <div class="grid">
+                    <div>
+                        <label>Minimum Age</label>
+                        <input type="number" name="age" value="{{ request.args.get('age', '') }}">
+                    </div>
+                    <div>
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="" {% if selected_status == "" %}selected{% endif %}>All</option>
+                            <option value="Unclaimed" {% if selected_status == "Unclaimed" %}selected{% endif %}>Unclaimed</option>
+                            <option value="Claimed" {% if selected_status == "Claimed" %}selected{% endif %}>Claimed</option>
+                            <option value="Cremated" {% if selected_status == "Cremated" %}selected{% endif %}>Cremated</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Missing Teeth</label>
+                        <input type="number" name="teeth" value="{{ request.args.get('teeth', '') }}">
+                    </div>
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button class="btn" type="submit">Search</button>
+                    <a class="btn" href="/dashboard">Dashboard</a>
+                </div>
+            </form>
+        </div>
+
+        <table>
+            <tr>
+                <th>Record</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Marks</th>
+                <th>Clothing</th>
+                <th>Date Found</th>
+                <th>Status</th>
+                <th>Details</th>
+                <th>Claim</th>
+            </tr>
+            {% for body in results %}
+            <tr>
+                <td>{{ body.body_id }}</td>
+                <td>{{ body.approx_age or "-" }}</td>
+                <td>{{ body.gender }}</td>
+                <td>{{ body.identifying_marks or "-" }}</td>
+                <td>{{ body.clothing_description or "-" }}</td>
+                <td>{{ body.date_found }}</td>
+                <td>{{ body.status }}</td>
+                <td><a class="btn" href="/body/{{ body.body_id }}">Open</a></td>
+                <td>
+                    {% if session.get("role_name") == "Public" and body.status != "Cremated" %}
+                    <form class="claim-form" method="post" action="/claim/{{ body.body_id }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="text" name="claimant_name" placeholder="Your name" required>
+                        <input type="text" name="claimant_phone" placeholder="Phone" required>
+                        <input type="text" name="claimant_relation" placeholder="Relation" required>
+                        <button class="btn" type="submit">Submit Claim</button>
+                    </form>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

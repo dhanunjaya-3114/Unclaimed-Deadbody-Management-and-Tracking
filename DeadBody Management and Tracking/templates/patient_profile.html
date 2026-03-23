@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Profile</title>
+    <style>
+        body {
+            background-color:#D6A64F;
+            padding: 100px;
+        }
+        .class1 {
+            background-color: white; 
+            margin:auto;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px; 
+        }
+
+        h1 {
+            text-align:center;
+            font-weight: bold;
+            text-decoration: underline;
+            color: black;
+        }
+
+        form {
+            background-color: #3D211A;
+            padding: 20px;
+            border-radius: 5px;
+            color: white; 
+        }
+        
+        hr {
+            border-bottom: 1px solid white; 
+        }
+
+        label {
+            font-weight: bold;
+            color:#D6A64F; 
+            font-size: 15px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 5px 0;
+            margin-top: 5px;
+            border: none;
+            background-color: transparent;
+            color: white;
+            font-size: 18px;
+        }
+        
+        button,a {
+            background-color: #D6A64F; 
+            color: black;
+            font-weight:bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            width: 100px;
+        }
+
+        a {
+            display: block;
+            width:fit-content;
+            text-decoration: none;
+            background-color: #3D211A;
+            color:#D6A64F;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="class1">
+        <h1>Patient Profile</h1>
+
+        <form action="{{ url_for('patient_profile') }}" method="POST">
+
+            <div>
+                <label for="p_fullname">Full Name:</label>
+                <input type="text" id="p_fullname" name="p_fullname" 
+                       value="{{ patient.p_fullname or '' }}" placeholder="Enter your full name" required>
+            </div>
+            <hr>
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 50%;">
+                    <label for="p_email">Email Address:</label>
+                    <input type="text" id="p_email" name="p_email" 
+                           value="{{ patient.p_email}}" placeholder="Enter your email" required>
+                </div>
+                
+                <div style="width: 50%;">
+                    <label for="p_phone">Phone Number:</label>
+                    <input type="text" id="p_phone" name="p_phone" 
+                           value="{{ patient.p_phone or '' }}" placeholder="e.g., +1234567890" required>
+                </div>
+            </div>
+            <hr>
+            <div>
+                <label for="p_address">Residential Address:</label>
+                <input type="text" id="p_address" name="p_address" 
+                       value="{{ patient.p_address or '' }}" placeholder="Enter your complete address" required>
+            </div>
+            <hr>
+            <div >
+                <center><button type="submit">
+                    {% if patient.p_fullname %}
+                        Update Profile
+                    {% else %}
+                        Save Profile
+                    {% endif %}
+                </button>
+                </center>
+            </div>
+        </form>
+        <center>
+        <div >
+            <a href="{{ url_for('dashboard_page') }}">Go Back</a>
+        </div>
+        </center>
+    </div>
+</body>
+</html>
+
+

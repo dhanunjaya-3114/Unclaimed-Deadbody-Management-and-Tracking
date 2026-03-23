@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Record Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f2ea; margin: 0; color: #2e1f13; }
+        .wrap { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+        .panel { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .item { border: 1px solid #eee2d3; border-radius: 8px; padding: 8px; }
+        .label { font-size: 12px; color: #6b4b34; display: block; margin-bottom: 4px; }
+        .btn {
+            background: #2e1f13;
+            color: #fff;
+            border: 0;
+            border-radius: 7px;
+            padding: 8px 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { border: 1px solid #ece3d8; padding: 8px; text-align: left; font-size: 14px; }
+        th { background: #f1e4d4; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="panel" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h2 style="margin: 0;">Record Details - {{ record.tag_number }}</h2>
+            <div style="display: flex; gap: 8px;">
+                <a class="btn" href="/search_body">Back to Search</a>
+                {% if role == "Admin" %}
+                <a class="btn" href="/edit_body/{{ record.body_id }}">Edit Record</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="grid">
+                <div class="item"><span class="label">Record ID</span>{{ record.body_id }}</div>
+                <div class="item"><span class="label">Tag Number</span>{{ record.tag_number }}</div>
+                <div class="item"><span class="label">Status</span>{{ record.status }}</div>
+                <div class="item"><span class="label">Date Found</span>{{ record.date_found }}</div>
+                <div class="item"><span class="label">Gender</span>{{ record.gender }}</div>
+                <div class="item"><span class="label">Approx Age</span>{{ record.approx_age or "-" }}</div>
+                <div class="item"><span class="label">Height</span>{{ record.height or "-" }}</div>
+                <div class="item"><span class="label">Body Build</span>{{ record.body_build or "-" }}</div>
+                <div class="item"><span class="label">Complexion</span>{{ record.complexion or "-" }}</div>
+                <div class="item"><span class="label">Missing Teeth</span>{{ record.missing_teeth if record.missing_teeth is not none else "-" }}</div>
+                <div class="item"><span class="label">Found Location</span>{{ record.found_location }}</div>
+                <div class="item"><span class="label">Registered By</span>{{ record.registered_by }}</div>
+                <div class="item"><span class="label">Cremation Date</span>{{ record.cremation_date or "-" }}</div>
+                <div class="item"><span class="label">Death Certificate</span>{{ record.death_certificate or "-" }}</div>
+                <div class="item" style="grid-column: 1 / -1;"><span class="label">Identifying Marks</span>{{ record.identifying_marks or "-" }}</div>
+                <div class="item" style="grid-column: 1 / -1;"><span class="label">Clothing Description</span>{{ record.clothing_description or "-" }}</div>
+                <div class="item" style="grid-column: 1 / -1;"><span class="label">Dental Notes</span>{{ record.dental_notes or "-" }}</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3 style="margin-top: 0;">Claim History</h3>
+            {% if claims %}
+            <table>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Relation</th>
+                    <th>Status</th>
+                    <th>Reviewed By</th>
+                    <th>Review Note</th>
+                </tr>
+                {% for claim in claims %}
+                <tr>
+                    <td>{{ claim.claim_id }}</td>
+                    <td>{{ claim.claimant_name }}</td>
+                    <td>{{ claim.claimant_phone }}</td>
+                    <td>{{ claim.claimant_relation }}</td>
+                    <td>{{ claim.status }}</td>
+                    <td>{{ claim.reviewed_by or "-" }}</td>
+                    <td>{{ claim.review_note or "-" }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p>No claims submitted for this record.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<style>
+    body {
+        background-color: #D6A64F;
+        padding: 150px 0;
+    }
+    .class1 {
+        max-width: 400px;
+        margin: auto;
+        background-color: #ece7d9;
+        padding: 50px;
+        border-radius: 10px;
+        }
+
+    h1 {
+        color: black;
+        text-align: center;
+        margin-bottom: 30px;
+        }
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    form {
+        font-weight:bold;
+    }
+    button {
+        background-color: #3D211A;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+</style>
+<body>
+    <div class="class1">
+
+        <h1>Login to Your Account</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p style="color: {% if category == 'error' %}#b00020{% else %}#0f7a32{% endif %};">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div>
+                <label for="email">Email : </label>
+                <input type="text" id="email" name="u_email" placeholder="Enter your Email" required>
+            </div>
+
+            <div>
+                <label for="password">Password: </label>
+                <input type="password" id="password" name="u_password" placeholder="Enter the password" required>
+            </div>
+
+            <center><button type="submit">Log In</button></center>
+
+        </form>
+
+        <center><p>Don't have an Account ? <a href="/signup">Click Here</a></p></center>
+    </div>
+
+</body>
+</html>
+
+
+
+

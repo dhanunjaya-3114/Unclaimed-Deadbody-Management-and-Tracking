@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Body Record</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f2ea; margin: 0; color: #2e1f13; }
+        .wrap { max-width: 760px; margin: 25px auto; background: #fff; border-radius: 10px; padding: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { font-size: 14px; font-weight: 600; }
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        textarea { min-height: 70px; }
+        .full { grid-column: 1 / -1; }
+        button, a {
+            background: #2e1f13;
+            color: #fff;
+            text-decoration: none;
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 14px;
+            cursor: pointer;
+        }
+        .actions { margin-top: 14px; display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <h2>Edit Body Record - {{ record.tag_number }}</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <p style="color: {% if category == 'error' %}#b00020{% else %}#0f7a32{% endif %};">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <form method="post" action="/edit_body/{{ record.body_id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="grid">
+                <div>
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="Male" {% if record.gender == "Male" %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if record.gender == "Female" %}selected{% endif %}>Female</option>
+                        <option value="Unknown" {% if record.gender == "Unknown" %}selected{% endif %}>Unknown</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Approx Age</label>
+                    <input name="age" type="number" min="0" max="130" value="{{ record.approx_age if record.approx_age is not none else '' }}">
+                </div>
+                <div>
+                    <label>Height</label>
+                    <input name="height" value="{{ record.height or '' }}">
+                </div>
+                <div>
+                    <label>Body Build</label>
+                    <input name="body_build" value="{{ record.body_build or '' }}">
+                </div>
+                <div>
+                    <label>Complexion</label>
+                    <input name="complexion" value="{{ record.complexion or '' }}">
+                </div>
+                <div>
+                    <label>Missing Teeth</label>
+                    <input name="teeth" type="number" min="0" max="32" value="{{ record.missing_teeth if record.missing_teeth is not none else '' }}">
+                </div>
+                <div>
+                    <label>Date Found</label>
+                    <input name="date_found" type="date" value="{{ record.date_found }}">
+                </div>
+                <div>
+                    <label>Found Location</label>
+                    <input name="found_location" required value="{{ record.found_location }}">
+                </div>
+                <div>
+                    <label>Status</label>
+                    <select name="status" required>
+                        <option value="Unclaimed" {% if record.status == "Unclaimed" %}selected{% endif %}>Unclaimed</option>
+                        <option value="Claimed" {% if record.status == "Claimed" %}selected{% endif %}>Claimed</option>
+                        <option value="Cremated" {% if record.status == "Cremated" %}selected{% endif %}>Cremated</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Death Certificate</label>
+                    <input name="death_certificate" value="{{ record.death_certificate or '' }}">
+                </div>
+                <div class="full">
+                    <label>Identifying Marks</label>
+                    <textarea name="marks">{{ record.identifying_marks or '' }}</textarea>
+                </div>
+                <div class="full">
+                    <label>Clothing Description</label>
+                    <textarea name="clothing">{{ record.clothing_description or '' }}</textarea>
+                </div>
+                <div class="full">
+                    <label>Dental Notes</label>
+                    <textarea name="dental_notes">{{ record.dental_notes or '' }}</textarea>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit">Save Changes</button>
+                <a href="/body/{{ record.body_id }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

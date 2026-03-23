@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Profile View</title>
+    <style>
+        body {
+            background-color:#D6A64F;
+            padding:100px;
+        }
+        .class1 {
+            margin:auto;
+            max-width:700px;
+            padding: 20px;
+            border-radius:10px;
+            background-color: white;
+        }
+        
+        h1 {
+            text-align:center;
+            text-decoration: underline; 
+            color: black; 
+        }
+        
+        .class2 {
+            background-color: #3D211A;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        hr {
+            background-color: white;
+            margin: 15px 0;
+        }
+
+        .class3 {
+            color:#D6A64F;
+            margin: 0;
+        }
+        
+        .class4 {
+            font-weight: bold;
+            color: white;
+            margin:0px;
+            font-size: 18px;
+        }
+                
+        a {
+            display: block;
+            width:fit-content;
+            margin: 20px;  
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #362828; 
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="class1">
+            <h1>
+                Patient Profile
+            </h1>
+        <div class="class2">
+            <div >
+                <p class="class3">Full Name</p>
+                <p class="class4">{{ p_fullname }}</p>
+            </div>
+            <hr>
+            <div style="display: flex; justify-content: space-between;">
+                
+                <div >
+                    <p class="class3">
+                        Email Address
+                    </p>
+                    <p class="class4">{{ p_email }}</p>
+                </div>
+                <div  style="width: 50%;">
+                    <p class="class3">
+                        Phone Number
+                    </p>
+                    <p class="class4">{{ p_phone }}</p>
+                </div>
+            </div>
+            <hr>
+             <div >
+                <p class="class3">
+                    Residential Address
+                </p>
+                <div>
+                    <p class="class4">{{ p_address }}</p>
+                </div>
+            </div>
+
+            </div>
+          <center><a href="/dashboard" >Go Back</a></center>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Doctor</title>
+</head>
+<style>
+    body {
+        background-color: #D6A64F;
+        padding: 100px ;
+    }
+    h2{
+        text-align:center;
+    }
+    .class1 {
+        max-width: 600px;
+        margin: auto;
+        background-color: #ece7d9;
+        padding: 50px;
+        border-radius: 10px;
+        }
+
+    h1 {
+        color: black;
+        text-align: center;
+        margin-bottom: 30px;
+        }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    form {
+        font-weight:bold;
+    }
+    button, a {
+        text-decoration:none;
+        background-color: #3D211A;
+        color: white;
+        margin-bottom: 30px;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+</style>
+<body>
+    <div class="class1">
+        <h2>Add Doctor to Hospital</h2>
+
+        <form action="/create_doctor" method="POST">
+
+                <div>
+                    <label for="doctor_email">Email:</label>
+                    <input type="email" id="doctor_email" name="doctor_email" placeholder="Enter Doctor's Email" required>
+                </div>
+
+                <div>
+                    <label for="doctor_password">Password:</label>
+                    <input type="password" id="doctor_password" name="doctor_password" placeholder="Enter Password" required>
+                </div>
+
+                <div>
+                    <label for="doctor_fullname">Full Name:</label>
+                    <input type="text" id="doctor_fullname" name="doctor_fullname" placeholder="Enter Full Name" required>
+                </div>
+
+                <div>
+                    <label for="doctor_licensekey">License Key:</label>
+                    <input type="text" id="doctor_licensekey" name="doctor_licensekey" placeholder="Enter License Key" required>
+                </div>
+
+                <div>
+                    <label for="doctor_age">Age:</label>
+                    <input type="number" id="doctor_age" name="doctor_age" placeholder="Enter Age" required >
+                </div>
+
+                <div>
+                    <label for="doctor_joiningdate">Joining Date:</label>
+                    <input type="date" id="doctor_joiningdate" name="doctor_joiningdate" required>
+                </div>
+
+                <div>
+
+                    <label for="doctor_department">Department:</label>
+                    <select id="doctor_department" name="doctor_department" required>
+                        <option value="">-- Select Department --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.dpt_id }}">{{ dept.dpt_name }}</option>
+                        {% endfor %}
+                    </select>
+                
+                </div>
+
+                <br>
+                <center><button type="submit">Create Doctor</button></center>
+
+                <center><a href="/dashboard" >Go Back</a></center>
+
+        </form>
+    </div>
+</body>
+</html>
+
