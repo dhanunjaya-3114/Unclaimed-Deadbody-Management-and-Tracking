@@ -30,6 +30,7 @@
         }
         form.inline { display: inline; }
         .claim-form input { margin-bottom: 6px; }
+        .muted { color: #6b6258; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -93,20 +94,27 @@
                 <td>{{ body.status }}</td>
                 <td><a class="btn" href="/body/{{ body.body_id }}">Open</a></td>
                 <td>
-                    {% if session.get("role_name") == "Public" and body.status != "Cremated" %}
-                    <form class="claim-form" method="post" action="/claim/{{ body.body_id }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                        <input type="text" name="claimant_name" placeholder="Your name" required>
-                        <input type="text" name="claimant_phone" placeholder="Phone" required>
-                        <input type="text" name="claimant_relation" placeholder="Relation" required>
-                        <button class="btn" type="submit">Submit Claim</button>
-                    </form>
+                    {% if role not in ["Admin", "Nurse", "Police"] and body.status == "Unclaimed" and body.body_id not in pending_claim_body_ids and (role != "Public" or body.body_id not in user_claim_body_ids) %}
+                    <a class="btn" href="/claim/{{ body.body_id }}">Claim</a>
+                    {% elif role == "Public" and body.body_id in pending_claim_body_ids %}
+                    <span class="muted">Pending admin approval</span>
+                    {% elif role == "Public" and body.body_id in user_claim_body_ids %}
+                    <span class="muted">Claim already submitted</span>
+                    {% elif body.status == "Claimed" %}
+                    <span class="muted">Already approved</span>
+                    {% elif body.status == "Cremated" %}
+                    <span class="muted">Not available</span>
                     {% else %}
                     -
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
+            {% if not results %}
+            <tr>
+                <td colspan="9" style="text-align: center;">No body records matched your search.</td>
+            </tr>
+            {% endif %}
         </table>
     </div>
 </body>

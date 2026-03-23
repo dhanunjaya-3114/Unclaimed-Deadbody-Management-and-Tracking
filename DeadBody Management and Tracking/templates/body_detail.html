@@ -23,6 +23,15 @@
         table { width: 100%; border-collapse: collapse; background: #fff; }
         th, td { border: 1px solid #ece3d8; padding: 8px; text-align: left; font-size: 14px; }
         th { background: #f1e4d4; }
+        input {
+            width: 100%;
+            border: 1px solid #bdbdbd;
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+        }
+        .muted { color: #6b4b34; }
     </style>
 </head>
 <body>
@@ -36,6 +45,16 @@
                 {% endif %}
             </div>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="panel">
+                {% for category, message in messages %}
+                <p style="color: {% if category == 'error' %}#b00020{% else %}#0f7a32{% endif %};">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
 
         <div class="panel">
             <div class="grid">
@@ -59,6 +78,22 @@
             </div>
         </div>
 
+        {% if role not in ["Admin", "Nurse", "Police"] %}
+        <div class="panel">
+            <h3 style="margin-top: 0;">Claim This Body</h3>
+            {% if record.status != "Unclaimed" %}
+            <p class="muted">This body is currently marked as {{ record.status }} and cannot receive a new claim.</p>
+            {% elif pending_claim_exists %}
+            <p class="muted">A claim request is already pending admin approval for this body.</p>
+            {% elif user_has_claimed %}
+            <p class="muted">You have already submitted a claim request for this body.</p>
+            {% else %}
+            <a class="btn" href="/claim/{{ record.body_id }}">Go to Claim Page</a>
+            <p class="muted" style="margin-bottom: 0;">Your request will stay pending until an admin or police user approves it.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <div class="panel">
             <h3 style="margin-top: 0;">Claim History</h3>
             {% if claims %}
@@ -66,6 +101,9 @@
                 <tr>
                     <th>Claim ID</th>
                     <th>Name</th>
+                    {% if role in ["Admin", "Police"] %}
+                    <th>Email</th>
+                    {% endif %}
                     <th>Phone</th>
                     <th>Relation</th>
                     <th>Status</th>
@@ -76,6 +114,9 @@
                 <tr>
                     <td>{{ claim.claim_id }}</td>
                     <td>{{ claim.claimant_name }}</td>
+                    {% if role in ["Admin", "Police"] %}
+                    <td>{{ claim.claimant_email }}</td>
+                    {% endif %}
                     <td>{{ claim.claimant_phone }}</td>
                     <td>{{ claim.claimant_relation }}</td>
                     <td>{{ claim.status }}</td>

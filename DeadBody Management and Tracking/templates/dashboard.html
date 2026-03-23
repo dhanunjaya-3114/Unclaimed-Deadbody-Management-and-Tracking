@@ -82,6 +82,14 @@
             border: 1px solid #bbb;
             width: 180px;
         }
+        textarea {
+            padding: 7px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            width: 220px;
+            min-height: 60px;
+            resize: vertical;
+        }
         .section-title {
             margin-top: 26px;
         }
@@ -150,13 +158,14 @@
         {% endif %}
         {% endif %}
 
-        {% if role in ["Admin", "Police"] and pending_claims %}
+        {% if role == "Admin" and pending_claims %}
         <h3 class="section-title">Pending Claims</h3>
         <table>
             <tr>
                 <th>Claim ID</th>
                 <th>Tag</th>
                 <th>Claimant</th>
+                <th>Email</th>
                 <th>Phone</th>
                 <th>Relation</th>
                 <th>Action</th>
@@ -166,19 +175,45 @@
                 <td>{{ claim.claim_id }}</td>
                 <td>{{ claim.body.tag_number }}</td>
                 <td>{{ claim.claimant_name }}</td>
+                <td>{{ claim.claimant_email }}</td>
                 <td>{{ claim.claimant_phone }}</td>
                 <td>{{ claim.claimant_relation }}</td>
                 <td>
                     <form class="inline" method="post" action="/review_claim/{{ claim.claim_id }}/approve">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                        <input type="text" name="review_note" placeholder="optional note">
+                        <textarea name="review_note" placeholder="optional approval note"></textarea>
                         <button class="btn" type="submit">Approve</button>
                     </form>
                     <form class="inline" method="post" action="/review_claim/{{ claim.claim_id }}/reject">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <textarea name="review_note" placeholder="optional rejection note"></textarea>
                         <button class="btn" type="submit">Reject</button>
                     </form>
                 </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if role == "Public" and user_claims %}
+        <h3 class="section-title">My Claim Requests</h3>
+        <table>
+            <tr>
+                <th>Claim ID</th>
+                <th>Tag</th>
+                <th>Status</th>
+                <th>Submitted On</th>
+                <th>Reviewed By</th>
+                <th>Review Note</th>
+            </tr>
+            {% for claim in user_claims %}
+            <tr>
+                <td>{{ claim.claim_id }}</td>
+                <td>{{ claim.body.tag_number }}</td>
+                <td>{{ claim.status }}</td>
+                <td>{{ claim.submitted_on }}</td>
+                <td>{{ claim.reviewed_by or "-" }}</td>
+                <td>{{ claim.review_note or "-" }}</td>
             </tr>
             {% endfor %}
         </table>
@@ -210,13 +245,20 @@
                     {% if role == "Admin" %}
                     <a class="btn" href="/edit_body/{{ body.body_id }}">Edit</a>
                     {% endif %}
+                    {% if role == "Public" and body.status == "Unclaimed" and body.body_id not in pending_claim_body_ids and body.body_id not in user_claim_body_ids %}
+                    <a class="btn" href="/claim/{{ body.body_id }}">Claim</a>
+                    {% elif role == "Public" and body.body_id in pending_claim_body_ids %}
+                    <span>Pending approval</span>
+                    {% elif role == "Public" and body.body_id in user_claim_body_ids %}
+                    <span>Already claimed</span>
+                    {% endif %}
                     {% if role in ["Admin", "Nurse", "Police"] and body.status != "Cremated" %}
                     <form method="post" action="/mark_cremated/{{ body.body_id }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="text" name="death_certificate" placeholder="certificate no">
                         <button class="btn" type="submit">Mark Cremated</button>
                     </form>
-                    {% else %}
+                    {% elif role in ["Admin", "Nurse", "Police"] %}
                     -
                     {% endif %}
                 </td>

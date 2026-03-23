@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Body Record</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f2ea; margin: 0; color: #2e1f13; }
+        .wrap { max-width: 760px; margin: 24px auto; padding: 0 16px; }
+        .panel { background: #fff; border-radius: 10px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .item { border: 1px solid #eee2d3; border-radius: 8px; padding: 8px; }
+        .label { font-size: 12px; color: #6b4b34; display: block; margin-bottom: 4px; }
+        input {
+            width: 100%;
+            border: 1px solid #bdbdbd;
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: #2e1f13;
+            color: #fff;
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .muted { color: #6b6258; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="panel">
+            <h2 style="margin-top: 0;">Claim Body Record</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <p style="color: {% if category == 'error' %}#b00020{% else %}#0f7a32{% endif %};">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <div class="grid" style="margin-bottom: 14px;">
+                <div class="item"><span class="label">Record ID</span>{{ record.body_id }}</div>
+                <div class="item"><span class="label">Tag Number</span>{{ record.tag_number }}</div>
+                <div class="item"><span class="label">Status</span>{{ record.status }}</div>
+                <div class="item"><span class="label">Date Found</span>{{ record.date_found }}</div>
+                <div class="item"><span class="label">Gender</span>{{ record.gender }}</div>
+                <div class="item"><span class="label">Found Location</span>{{ record.found_location }}</div>
+            </div>
+
+            {% if record.status != "Unclaimed" %}
+            <p class="muted">This body is currently marked as {{ record.status }} and cannot receive a new claim.</p>
+            {% elif pending_claim_exists %}
+            <p class="muted">A claim request is already pending admin approval for this body.</p>
+            {% elif user_has_claimed %}
+            <p class="muted">You have already submitted a claim request for this body.</p>
+            {% else %}
+            <form method="post" action="/claim/{{ record.body_id }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="text" name="claimant_name" placeholder="Your full name" required>
+                <input type="text" name="claimant_phone" placeholder="Your phone number" required>
+                <input type="text" name="claimant_relation" placeholder="Relation to the deceased" required>
+                <div class="actions">
+                    <button class="btn" type="submit">Submit Claim</button>
+                    <a class="btn" href="/body/{{ record.body_id }}">Back to Record</a>
+                </div>
+            </form>
+            <p class="muted" style="margin-bottom: 0;">Your claim will remain pending until an admin approves or rejects it.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
